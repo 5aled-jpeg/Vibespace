@@ -149,36 +149,32 @@ export function restoreShapeWithGenie({
     win = { x: Math.round((window.innerWidth - winW) / 2), y: Math.round((window.innerHeight - winH) / 2) };
   }
 
-  if (!showAnimations) {
-    useAppStore.getState().restoreShape(shapeId);
-    try {
-      editor.setSelectedShapes([shapeId as any]);
-    } catch {
-      // safe fallback
-    }
-    return;
+  // Immediately restore state so UI is never blocked
+  useAppStore.getState().restoreShape(shapeId);
+  try {
+    editor.setSelectedShapes([shapeId as any]);
+  } catch {
+    // safe fallback
   }
 
-  const texture = getOrCreateToolTexture(toolType, winW, winH);
+  if (!showAnimations) return;
 
-  triggerGenieEffect({
-    toolType,
-    dir: 'open',
-    dock,
-    win,
-    winW,
-    winH,
-    texture,
-    duration: 480,
-    onDone: () => {
-      useAppStore.getState().restoreShape(shapeId);
-      try {
-        editor.setSelectedShapes([shapeId as any]);
-      } catch {
-        // safe fallback
-      }
-    },
-  });
+  try {
+    const texture = getOrCreateToolTexture(toolType, winW, winH);
+
+    triggerGenieEffect({
+      toolType,
+      dir: 'open',
+      dock,
+      win,
+      winW,
+      winH,
+      texture,
+      duration: 380,
+    });
+  } catch (err) {
+    console.warn('[Genie] Restore animation error:', err);
+  }
 }
 
 // Spawn a new window with Mac Genie Effect
@@ -189,42 +185,43 @@ export function spawnShapeWithGenie({
   targetPos,
   onSpawn,
 }: SpawnGenieOptions) {
+  // Always spawn the shape immediately so user clicks are never lost or delayed
+  onSpawn();
+
   const showAnimations = useAppStore.getState().showAnimations;
-  const dock = getDockIconCenter(toolType);
+  if (!showAnimations) return;
 
-  const viewport = editor.getViewportPageBounds();
-  const centerX = viewport.minX + viewport.width / 2;
-  const centerY = viewport.minY + viewport.height / 2;
+  try {
+    const dock = getDockIconCenter(toolType);
 
-  const pageX = targetPos ? targetPos.x : centerX - targetShape.w / 2;
-  const pageY = targetPos ? targetPos.y : centerY - targetShape.h / 2;
+    const viewport = editor.getViewportPageBounds();
+    const centerX = viewport.minX + viewport.width / 2;
+    const centerY = viewport.minY + viewport.height / 2;
 
-  const screenPoint = editor.pageToScreen({ x: pageX, y: pageY });
-  const zoom = editor.getZoomLevel();
-  const winW = Math.round(targetShape.w * zoom);
-  const winH = Math.round(targetShape.h * zoom);
-  const win = { x: Math.round(screenPoint.x), y: Math.round(screenPoint.y) };
+    const pageX = targetPos ? targetPos.x : centerX - targetShape.w / 2;
+    const pageY = targetPos ? targetPos.y : centerY - targetShape.h / 2;
 
-  if (!showAnimations) {
-    onSpawn();
-    return;
+    const screenPoint = editor.pageToScreen({ x: pageX, y: pageY });
+    const zoom = editor.getZoomLevel();
+    const winW = Math.round(targetShape.w * zoom);
+    const winH = Math.round(targetShape.h * zoom);
+    const win = { x: Math.round(screenPoint.x), y: Math.round(screenPoint.y) };
+
+    const texture = getOrCreateToolTexture(toolType, winW, winH);
+
+    triggerGenieEffect({
+      toolType,
+      dir: 'open',
+      dock,
+      win,
+      winW,
+      winH,
+      texture,
+      duration: 380,
+    });
+  } catch (err) {
+    console.warn('[Genie] Spawn animation error:', err);
   }
-
-  const texture = getOrCreateToolTexture(toolType, winW, winH);
-
-  triggerGenieEffect({
-    toolType,
-    dir: 'open',
-    dock,
-    win,
-    winW,
-    winH,
-    texture,
-    duration: 480,
-    onDone: () => {
-      onSpawn();
-    },
-  });
 }
 
 export interface CascadeOptions {

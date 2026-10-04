@@ -627,7 +627,18 @@ export const triggerGenieEffect = ({
     onDone,
   };
 
-  listeners.forEach((fn) => fn(job));
+  if (listeners.size === 0) {
+    onDone?.();
+    return;
+  }
+
+  listeners.forEach((fn) => {
+    try {
+      fn(job);
+    } catch (err) {
+      console.warn('[Genie] Listener execution error:', err);
+    }
+  });
 };
 
 // ─── Genie Overlay Component ──────────────────────────────────────────────────

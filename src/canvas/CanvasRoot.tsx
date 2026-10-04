@@ -334,92 +334,123 @@ export function CanvasRoot() {
 
     // Helper to seed initial demo shapes on fresh canvas for brand new users
     const seedDefaultDemoShapes = () => {
-      // 1. Initial Video node
-      editor.createShape({
-        id: createShapeId('video-initial'),
-        type: 'video-node' as any,
-        x: 100,
-        y: 100,
-        props: {
-          w: 640,
-          h: 420,
-          src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-          title: 'Big Buck Bunny (Sync Stream)',
-          isHost: true,
-        },
-      });
+      try {
+        // 1. Initial Video node
+        editor.createShape({
+          id: createShapeId(),
+          type: 'video-node' as any,
+          x: 100,
+          y: 100,
+          props: {
+            w: 640,
+            h: 420,
+            src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            title: 'Big Buck Bunny (Sync Stream)',
+            isHost: true,
+          },
+        });
+      } catch (e) {
+        console.warn('[Seed] Error creating video shape:', e);
+      }
 
-      // 2. Photo Canvas node
-      editor.createShape({
-        id: createShapeId('image-initial'),
-        type: 'image-node' as any,
-        x: 770,
-        y: 100,
-        props: {
-          w: 520,
-          h: 420,
-          src: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-          title: 'Sierra Dawn (Wallpaper)',
-        },
-      });
+      try {
+        // 2. Photo Canvas node
+        editor.createShape({
+          id: createShapeId(),
+          type: 'image-node' as any,
+          x: 770,
+          y: 100,
+          props: {
+            w: 520,
+            h: 420,
+            src: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            title: 'Sierra Dawn (Wallpaper)',
+          },
+        });
+      } catch (e) {
+        console.warn('[Seed] Error creating image shape:', e);
+      }
 
-      // 3. Audio player node
-      editor.createShape({
-        id: createShapeId('audio-initial'),
-        type: 'audio-node' as any,
-        x: 100,
-        y: 550,
-        props: {
-          w: 340,
-          h: 500,
-          src: '',
-          title: '',
-          artist: '',
-          cover: '',
-        },
-      });
+      try {
+        // 3. Audio player node
+        editor.createShape({
+          id: createShapeId(),
+          type: 'audio-node' as any,
+          x: 100,
+          y: 550,
+          props: {
+            w: 340,
+            h: 500,
+            src: '',
+            title: '',
+            artist: '',
+            cover: '',
+          },
+        });
+      } catch (e) {
+        console.warn('[Seed] Error creating audio shape:', e);
+      }
 
-      // 4. Code Runner node
-      editor.createShape({
-        id: createShapeId('code-initial'),
-        type: 'code-runner-node' as any,
-        x: 570,
-        y: 550,
-        props: {
-          w: 580,
-          h: 440,
-          code: `// Spatial JS/TS Interactive Node\nconsole.log("Spatial Workspace Ready!");\nconst latency = Math.floor(Math.random() * 15 + 25);\nconsole.log("LiveKit Mesh RTC Latency:", latency, "ms");\n`,
-          language: 'typescript',
-          title: 'Interactive Code Runner',
-        },
-      });
+      try {
+        // 4. Code Runner node
+        editor.createShape({
+          id: createShapeId(),
+          type: 'code-runner-node' as any,
+          x: 570,
+          y: 550,
+          props: {
+            w: 580,
+            h: 440,
+            code: `// Spatial JS/TS Interactive Node\nconsole.log("Spatial Workspace Ready!");\nconst latency = Math.floor(Math.random() * 15 + 25);\nconsole.log("LiveKit Mesh RTC Latency:", latency, "ms");\n`,
+            language: 'typescript',
+            title: 'Interactive Code Runner',
+          },
+        });
+      } catch (e) {
+        console.warn('[Seed] Error creating code shape:', e);
+      }
 
-      // 5. Todo card node
-      editor.createShape({
-        id: createShapeId('todo-initial'),
-        type: 'todo-node' as any,
-        x: 1180,
-        y: 550,
-        props: {
-          w: 360,
-          h: 440,
-          title: 'Action Items',
-        },
-      });
+      try {
+        // 5. Todo card node
+        editor.createShape({
+          id: createShapeId(),
+          type: 'todo-node' as any,
+          x: 1180,
+          y: 550,
+          props: {
+            w: 360,
+            h: 440,
+            title: 'Action Items',
+          },
+        });
+      } catch (e) {
+        console.warn('[Seed] Error creating todo shape:', e);
+      }
     };
 
     // Load persisted local environment with full coordinates, camera, and shapes
     loadSavedEnvironment(editor).then((restored) => {
-      if (restored) {
+      try {
         const currentShapes = editor.getCurrentPageShapes();
         const appState = useAppStore.getState();
-        if (currentShapes.length === 0 && appState.minimizedShapes.length === 0) {
+        const validMinimized = appState.minimizedShapes.filter((m) => {
+          try {
+            return !!editor.getShape(m.id as any);
+          } catch {
+            return false;
+          }
+        });
+        if (validMinimized.length !== appState.minimizedShapes.length) {
+          useAppStore.setState({ minimizedShapes: validMinimized });
+        }
+
+        if (currentShapes.length === 0 && validMinimized.length === 0) {
           seedDefaultDemoShapes();
         } else {
           sanitizeAudioNodes();
         }
-      } else {
-        // Only seed demo shapes if canvas is completely empty and no prior state exists
+      } catch (err) {
+        console.warn('[Persistence] Restore post-processing error:', err);
         if (editor.getCurrentPageShapes().length === 0) {
           seedDefaultDemoShapes();
         }
