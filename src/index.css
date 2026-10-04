@@ -1,0 +1,211 @@
+@import 'tldraw/tldraw.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --canvas-bg: #0a0d14;
+    --canvas-surface: #11151e;
+    --glass-background: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --accent-color: #3b82f6;
+    --accent-rgb: 59, 130, 246;
+
+    /* Shadcn & Extend UI Theme Variables (Default Dark) */
+    --background: #141721;
+    --foreground: #f8fafc;
+    --card: #181d28;
+    --card-foreground: #f8fafc;
+    --popover: #181d28;
+    --popover-foreground: #f8fafc;
+    --muted: #222938;
+    --muted-foreground: #94a3b8;
+    --border: rgba(255, 255, 255, 0.12);
+    --input: rgba(255, 255, 255, 0.15);
+    --ring: #3b82f6;
+    --sidebar: #10131c;
+    --sidebar-foreground: #f8fafc;
+  }
+
+  html:not(.dark) {
+    --canvas-bg: #f0f2f5;
+    --canvas-surface: #ffffff;
+    --glass-background: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.09);
+
+    /* Light Mode Variables */
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --border: rgba(0, 0, 0, 0.12);
+    --input: rgba(0, 0, 0, 0.15);
+    --ring: #3b82f6;
+    --sidebar: #f8fafc;
+    --sidebar-foreground: #0f172a;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', Roboto, sans-serif;
+    background-color: var(--canvas-bg);
+    letter-spacing: -0.015em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* Apple visionOS Glassmorphism Panel (Dark Mode) */
+.glass-vision {
+  background: rgba(255, 255, 255, 0.065);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+}
+
+.glass-vision-card {
+  background: rgba(18, 22, 32, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 20px 50px 0 rgba(0, 0, 0, 0.40), inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
+}
+
+.glass-vision-pill {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Apple visionOS Glassmorphism Panel (Light Mode) */
+html:not(.dark) .glass-vision {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.9) !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) .glass-vision-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 20px 45px 0 rgba(0, 0, 0, 0.09), inset 0 1px 0 0 rgba(255, 255, 255, 1) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .glass-vision-pill {
+  background: rgba(255, 255, 255, 0.90) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.07), inset 0 1px 0 0 rgba(255, 255, 255, 1) !important;
+  color: #0f172a !important;
+}
+
+/* Solid Opaque Window Style Option */
+[data-window-style="solid"] .glass-vision-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: #131722 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 25px 60px 0 rgba(0, 0, 0, 0.60) !important;
+}
+
+html:not(.dark)[data-window-style="solid"] .glass-vision-card,
+html:not(.dark) [data-window-style="solid"] .glass-vision-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 25px 60px 0 rgba(0, 0, 0, 0.12) !important;
+  color: #0f172a !important;
+}
+
+/* Reduced Motion (When Animations are Toggled OFF) */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* GPU Acceleration */
+.gpu-layer {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Subtle Apple Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Remove default tldraw selection bounding box and default blue square corner handles */
+.tl-selection__fg,
+.tl-selection__bg,
+.tl-corner-handle,
+.tl-selection__corner,
+.tl-indicator,
+.tl-selection__box,
+.tl-selection__bounding-box,
+[data-testid="selection-foreground"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Custom Infinite Canvas SVG Pattern Background */
+.tl-background {
+  background-color: var(--canvas-bg) !important;
+  background-image: var(--canvas-pattern-url) !important;
+  background-repeat: repeat !important;
+  background-size: var(--canvas-pattern-size, 48px 48px) !important;
+  background-position: var(--canvas-pattern-pos, 0px 0px) !important;
+  width: 100% !important;
+  height: 100% !important;
+  transition: background-color 0.2s ease;
+}
+
+/* Suppress default tldraw dot grid to avoid collision with custom SVG patterns */
+.tl-grid {
+  display: none !important;
+}
+
+/* Suppress tldraw dev watermark so corner controls sit cleanly */
+.tl-watermark,
+.tlui-watermark,
+.tlui-layout__bottom__right,
+[data-testid="watermark"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
